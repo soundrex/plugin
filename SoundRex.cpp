@@ -100,11 +100,11 @@ SoundRex::SoundRex(IPlugInstanceInfo instanceInfo)
   MakeDefaultPreset((char *) "-", kNumPrograms);
 
   scaClient.sin_family = AF_INET;
-  scaClient.sin_addr.s_addr = inet_addr("127.0.0.1");
+  scaClient.sin_addr.s_addr = inet_addr("192.167.1.106");
   scaClient.sin_port = htons(9428);
 
   scaServer.sin_family = AF_INET;
-  scaServer.sin_addr.s_addr = inet_addr("127.0.0.1");
+  scaServer.sin_addr.s_addr = inet_addr("192.167.1.1");
   scaServer.sin_port = htons(9430);
 }
 
@@ -115,7 +115,7 @@ void SoundRex::ProcessDoubleReplacing(double** inputs, double** outputs, int nFr
   // Mutex is already locked for us.
   for (int s = 0; s < nFrames; ++s) {
     for (int t=0; t<num_channels; ++t) {  // THIS IS THE CODE WHICH ACTUALLY ASSUMES sample_t == uint8_t
-      *itr++ = (uint8_t)(255*inputs[t][s]);
+      *itr++ = (uint8_t)(255*(inputs[t][s]+1)/2);
     }
 
     if (itr == packet.end()) {

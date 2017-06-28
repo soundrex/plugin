@@ -43,7 +43,7 @@
 instrument determined by PLUG _IS _INST
 */
 
-#define PLUG_CHANNEL_IO "4-1" // Another place that uses num-channels == 3
+#define PLUG_CHANNEL_IO "3-0" // Another place that uses num-channels == 3
 
 #define PLUG_LATENCY 0
 #define PLUG_IS_INST 0
@@ -52,12 +52,6 @@ instrument determined by PLUG _IS _INST
 #define PLUG_DOES_MIDI 1
 
 #define PLUG_DOES_STATE_CHUNKS 0
-
-// Unique IDs for each image resource.
-#define KNOB_ID 102
-
-// Image resource locations for this plug.
-#define KNOB_FN "resources/img/knob.png"
 
 // GUI default dimensions
 #define GUI_WIDTH 300
