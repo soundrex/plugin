@@ -19,6 +19,7 @@
 #include <sys/socket.h>
 
 typedef uint8_t sample_t;
+constexpr sample_t maxval =  255;
 
 constexpr int num_samples = 384;
 constexpr int num_channels = 3;
@@ -28,6 +29,41 @@ uint32_t packet_num = 0;
 sockaddr_in scaClient, scaServer;
 socklen_t addrlen = sizeof(scaServer);
 int sockfd = 0;
+
+template <typename T, int N>
+struct valarray_t {
+  std::array<T,N> data;
+  valarray_t(T val=0) {
+    for (T &t: data)
+      t = val;
+  }
+
+  valarray_t<T,N> operator+(valarray_t<T,N> const &other) const {
+    valarray_t<T,N> res;
+    for (int i=0; i<N; ++i) {
+      res.data[i] = data[i] + other.data[i];
+    }
+    return res;
+  }
+
+  valarray_t<T,N> operator-(valarray_t<T,N> const &other) const {
+    valarray_t<T,N> res;
+    for (int i=0; i<N; ++i) {
+      res.data[i] = data[i] - other.data[i];
+    }
+    return res;
+  }
+
+  valarray_t<T,N> operator*(T const &mul) const {
+    valarray_t<T,N> res;
+    for (int i=0; i<N; ++i) {
+      res.data[i] = mul * data[i];
+    }
+    return res;
+  }
+};
+
+typedef valarray_t<double, num_channels> value_t;
 
 void send_to_router(void const *data, size_t size) {
   if (sockfd == 0) {
@@ -109,23 +145,45 @@ SoundRex::SoundRex(IPlugInstanceInfo instanceInfo)
 }
 
 void SoundRex::ProcessDoubleReplacing(double** inputs, double** outputs, int nFrames) {
+  static std::array<value_t, 4> buffer;
+  static int bufdex = 0;
+  static double pos = 1;
   static std::array<uint8_t, sizeof(sample_t) * num_channels * num_samples + 1> packet;
   static auto itr = packet.begin() + 1;
 
+  double const incr = GetSampleRate()/24000;
   // Mutex is already locked for us.
   for (int s = 0; s < nFrames; ++s) {
-    for (int t=0; t<num_channels; ++t) {  // THIS IS THE CODE WHICH ACTUALLY ASSUMES sample_t == uint8_t
-      *itr++ = (uint8_t)(255*(inputs[t][s]+1)/2);
+    for (int t=0; t<num_channels; ++t) {
+      buffer[bufdex].data[t] = inputs[t][s];
     }
+    bufdex = (bufdex+1)&3;
 
-    if (itr == packet.end()) {
-      itr = packet.begin();
-      *itr++ = packet_num % 252;
-      if (packet_num % num_skip == 0)
-        transmit_data();
+    for (pos-=1; pos<1; pos+=incr) {
+      double const vec = 2*pos-1;
+      value_t const &m3_2 = buffer[bufdex&3];
+      value_t const &m1_2 = buffer[(bufdex+1)&3];
+      value_t const &p1_2 = buffer[(bufdex+2)&3];
+      value_t const &p3_2 = buffer[(bufdex+3)&3];
+      value_t const g1 = p1_2 + m1_2;
+      value_t const g3 = p3_2 + m3_2;
+      value_t const h1 = p1_2 - m1_2;
+      value_t const h3 = (p3_2 - m3_2)*(1./3);
 
-      send_to_router(packet.data(), packet.size());
-      ++packet_num;
+      value_t val =  ((g1*9 - g3) + ((h1*9 - h3) + ((g3-g1) + (h3-h1)*vec)*vec)*vec) * (1.0/16);
+      val = (val + value_t(1))*(maxval/2.);
+      for (double v: val.data)
+        *itr++ = static_cast<uint8_t>(v);
+
+      if (itr == packet.end()) {
+        itr = packet.begin();
+        *itr++ = packet_num % 252;
+        if (packet_num % num_skip == 0)
+          transmit_data();
+
+        send_to_router(packet.data(), packet.size());
+        ++packet_num;
+      }
     }
   }
 }
