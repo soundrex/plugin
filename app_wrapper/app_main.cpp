@@ -732,7 +732,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdPa
 
         GetPrivateProfileString("audio", "iovs", "512", gState->mAudioIOVS, 100, gINIPath);
         GetPrivateProfileString("audio", "sigvs", "32", gState->mAudioSigVS, 100, gINIPath);
-        GetPrivateProfileString("audio", "sr", "44100", gState->mAudioSR, 100, gINIPath);
+        GetPrivateProfileString("audio", "sr", "24000", gState->mAudioSR, 100, gINIPath);
 
         //midi
         GetPrivateProfileString("midi", "indev", "no input", gState->mMidiInDev, 100, gINIPath);
@@ -852,7 +852,7 @@ INT_PTR SWELLAppMain(int msg, INT_PTR parm1, INT_PTR parm2)
 
           GetPrivateProfileString("audio", "iovs", "512", gState->mAudioIOVS, 100, gINIPath);
           GetPrivateProfileString("audio", "sigvs", "32", gState->mAudioSigVS, 100, gINIPath);
-          GetPrivateProfileString("audio", "sr", "44100", gState->mAudioSR, 100, gINIPath);
+          GetPrivateProfileString("audio", "sr", "24000", gState->mAudioSR, 100, gINIPath);
 
           //midi
           GetPrivateProfileString("midi", "indev", "no input", gState->mMidiInDev, 100, gINIPath);

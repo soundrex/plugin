@@ -85,7 +85,7 @@ struct AppState
   {
     strcpy(mAudioInDev, DEFAULT_INPUT_DEV);
     strcpy(mAudioOutDev, DEFAULT_OUTPUT_DEV);
-    strcpy(mAudioSR, "44100");
+    strcpy(mAudioSR, "24000");
     strcpy(mAudioIOVS, "512");
     strcpy(mAudioSigVS, "32");
 
