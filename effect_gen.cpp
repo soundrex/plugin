@@ -83,7 +83,7 @@ std::ostream& operator<< (std::ostream &out, effect_t const &effect) {
             out << "I < + p - I % # h " << num_cols << " f "
             << (num_cols-1) * (0.5 - 0.4*cos(effect.omega()*packet_num)) << " 2"
             " p - I % / # h " << num_cols << " h " << num_rows << " f "
-            << (num_cols-1) * (0.5 - 0.4*sin(effect.omega()*packet_num)) << " 2"
+            << (num_rows-1) * (0.5 - 0.4*sin(effect.omega()*packet_num)) << " 2"
             " h 5";
             break;
         case effect_t::Randomized:
