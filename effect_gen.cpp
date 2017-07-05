@@ -32,12 +32,6 @@ union fprintr {
     fprintr(float const fl): f(fl) {}
 };
 
-std::ostream& operator<< (std::ostream &out, fprintr const &fr) {
-    for (int i=0; i<4; ++i)
-        out << (uint16_t)fr.c[i] << ' ';
-    return out;
-}
-
 //////////////////////////// implementations //////////////////////////////
 void set_rows(int const num) {
     num_rows = num;
@@ -82,32 +76,32 @@ std::ostream& operator<< (std::ostream &out, effect_t const &effect) {
             break;
         case effect_t::LeftToRight:
             out << "e - h 0 / p - f "
-            << fprintr((num_cols-1)*0.5*(1+sin(effect.omega()*packet_num)))
+            << (num_cols-1)*0.5*(1+sin(effect.omega()*packet_num))
             << " I % # h " << num_cols << " 2 h 2";
             break;
         case effect_t::Circular:
             out << "I < + p - I % # h " << num_cols << " f "
-            << fprintr((num_cols-1) * (0.5 - 0.4*cos(effect.omega()*packet_num))) << " 2"
+            << (num_cols-1) * (0.5 - 0.4*cos(effect.omega()*packet_num)) << " 2"
             " p - I % / # h " << num_cols << " h " << num_rows << " f "
-            << fprintr((num_cols-1) * (0.5 - 0.4*sin(effect.omega()*packet_num))) << " 2"
+            << (num_cols-1) * (0.5 - 0.4*sin(effect.omega()*packet_num)) << " 2"
             " h 5";
             break;
         case effect_t::Randomized:
             out << "I *"
-            " < | - I % # h " << num_cols << " f " << fprintr(xdist.dist(gen, (int)effect.timePeriod())*0.5) << " h 3"
+            " < | - I % # h " << num_cols << " f " << xdist.dist(gen, (int)effect.timePeriod())*0.5 << " h 3"
             " < | - I % / # h " << num_cols << " h " << num_rows << " f "
-            << fprintr(ydist.dist(gen, (int)effect.timePeriod())*0.5) << "h 3";
+            << ydist.dist(gen, (int)effect.timePeriod())*0.5 << "h 3";
             break;
         case effect_t::SpreadingOut:
             out << "*"
             " I < | - I % # h " << num_cols << " f " << (num_cols-1)*0.5 << " f "
-            << fprintr((num_cols+1)*0.5*(0.3 + 0.7*packet_num/effect.timePeriod()))
+            << (num_cols+1)*0.5*(0.3 + 0.7*packet_num/effect.timePeriod())
             << " I < | - I / # h " << num_cols << " f " << (num_rows-1)*0.5 << " f "
-            << fprintr((num_rows+1)*0.5*(0.3 + 0.7*packet_num/effect.timePeriod()));
+            << (num_rows+1)*0.5*(0.3 + 0.7*packet_num/effect.timePeriod());
             break;
         case effect_t::Diagonal:
             out << "e - h 0 / p - f "
-            << fprintr((num_cols-1)*0.5*(1+sin(effect.omega()*packet_num)))
+            << (num_cols-1)*0.5*(1+sin(effect.omega()*packet_num))
             << " / + I % # h " << num_cols << " I % / # h " << num_cols << " h " << num_rows << " f 1.414 2 h 2";
             break;
         case effect_t::typeNum:; // For completeness
