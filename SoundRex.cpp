@@ -21,10 +21,7 @@
 typedef uint8_t sample_t;
 constexpr sample_t maxval =  255;
 
-constexpr int num_samples = 384;
-constexpr int num_channels = 3;
-
-std::array<effect_t, num_channels> effects;
+std::array<effect_t, num_channels> effects {0, 1, 2};
 uint32_t packet_num = 0;
 sockaddr_in scaClient, scaServer;
 socklen_t addrlen = sizeof(scaServer);
@@ -118,6 +115,8 @@ SoundRex::SoundRex(IPlugInstanceInfo instanceInfo)
   //arguments are: name, defaultVal, minVal, maxVal
   GetParam(kNumRows)->InitInt("Number of Rows", 10, 1, 50);
   GetParam(kNumColumns)->InitInt("Number of Columns", 10, 1, 50);
+  set_rows(GetParam(kNumRows)->Value());
+  set_cols(GetParam(kNumColumns)->Value());
 
   //arguments are: name, defaultVal, numEnums
   GetParam(kType1)->InitEnum("Effect 1", effect_t::Immersive, effect_t::typeNum);

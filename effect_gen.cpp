@@ -15,7 +15,7 @@ struct repeat_rand {
     unsigned int count = 0, prev;
     std::uniform_int_distribution<int> dist_;
 
-    repeat_rand (int a, int b) : dist_(a, b) {}
+    repeat_rand (int a=0, int b=0) : dist_(a, b) {}
 
     template <typename foo>
     int dist(foo &gen, unsigned int bound) {
@@ -24,7 +24,7 @@ struct repeat_rand {
 
         return prev;
     }
-} xdist(1, 19), ydist(1, 19);
+} xdist[num_channels], ydist[num_channels];
 
 union fprintr {
     float f;
@@ -35,12 +35,14 @@ union fprintr {
 //////////////////////////// implementations //////////////////////////////
 void set_rows(int const num) {
     num_rows = num;
-    ydist = repeat_rand(1, 2*num-1);
+    for (int i=0; i<num_channels; ++i)
+        ydist[i] = repeat_rand(1, 2*num-1);
 }
 
 void set_cols(int const num) {
     num_cols = num;
-    xdist = repeat_rand(1, 2*num-1);
+    for (int i=0; i<num_channels; ++i)
+        xdist[i] = repeat_rand(1, 2*num-1);
 }
 
 
@@ -88,9 +90,9 @@ std::ostream& operator<< (std::ostream &out, effect_t const &effect) {
             break;
         case effect_t::Randomized:
             out << "I *"
-            " < | - I % # h " << num_cols << " f " << xdist.dist(gen, (int)effect.timePeriod())*0.5 << " h 3"
+            " < | - I % # h " << num_cols << " f " << xdist[effect.track_id].dist(gen, (int)effect.timePeriod())*0.5 << " h 3"
             " < | - I % / # h " << num_cols << " h " << num_rows << " f "
-            << ydist.dist(gen, (int)effect.timePeriod())*0.5 << "h 3";
+            << ydist[effect.track_id].dist(gen, (int)effect.timePeriod())*0.5 << "h 3";
             break;
         case effect_t::SpreadingOut:
             out << "*"
