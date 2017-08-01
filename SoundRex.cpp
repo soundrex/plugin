@@ -23,7 +23,7 @@ constexpr sample_t maxval =  255;
 
 std::array<effect_t, num_channels> effects {0, 1, 2};
 uint32_t packet_num = 0;
-sockaddr_in scaClient, scaServer;
+sockaddr_in scaServer;
 socklen_t addrlen = sizeof(scaServer);
 int sockfd = 0;
 
@@ -143,10 +143,6 @@ SoundRex::SoundRex(IPlugInstanceInfo instanceInfo)
 
   //MakePreset("preset 1", ... );
   MakeDefaultPreset((char *) "-", kNumPrograms);
-
-  scaClient.sin_family = AF_INET;
-  scaClient.sin_addr.s_addr = inet_addr("192.167.1.106");
-  scaClient.sin_port = htons(9428);
 
   scaServer.sin_family = AF_INET;
   scaServer.sin_addr.s_addr = inet_addr("192.167.1.1");
