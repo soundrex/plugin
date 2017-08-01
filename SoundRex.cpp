@@ -75,8 +75,10 @@ void transmit_data() {
   to_send.push_back(num_channels);
 
   std::stringstream effect_stream;
-  for (effect_t &effect: effects)
+  for (effect_t &effect: effects) {
+    effect.theta += effect.omega();
     effect_stream << effect << ' ';
+  }
 
   std::string effect_str = effect_stream.str();
   write_to_vec(effect_str.c_str(), to_send);
@@ -94,6 +96,9 @@ enum EParams {
   kPeriod2,
   kType3,
   kPeriod3,
+  kVolume1,
+  kVolume2,
+  kVolume3,
   kNumParams
 };
 
@@ -130,6 +135,11 @@ SoundRex::SoundRex(IPlugInstanceInfo instanceInfo)
   GetParam(kPeriod1)->InitDouble("Time Period 1", 1., 0.01, 20.0, 0.01, "s");
   GetParam(kPeriod2)->InitDouble("Time Period 2", 1., 0.01, 20.0, 0.01, "s");
   GetParam(kPeriod3)->InitDouble("Time Period 3", 1., 0.01, 20.0, 0.01, "s");
+
+  //arguments are: name, defaultVal, minVal, maxVal, step
+  GetParam(kVolume1)->InitDouble("Volume 1", 80., 0., 100., .1, "%");
+  GetParam(kVolume2)->InitDouble("Volume 2", 80., 0., 100., .1, "%");
+  GetParam(kVolume3)->InitDouble("Volume 3", 80., 0., 100., .1, "%");
 
   //MakePreset("preset 1", ... );
   MakeDefaultPreset((char *) "-", kNumPrograms);
@@ -216,18 +226,30 @@ void SoundRex::OnParamChange(int paramIdx) {
       break;
     case kType1:
       effects[0].type = (effect_t::type_t)(GetParam(paramIdx)->Int());
+      effects[0].init_packet = packet_num;
+      break;
+    case kVolume1:
+      effects[0].volume = GetParam(paramIdx)->Value()/100;
       break;
     case kPeriod1:
       effects[0].timePeriod_s = GetParam(paramIdx)->Value();
       break;
     case kType2:
       effects[1].type = (effect_t::type_t)(GetParam(paramIdx)->Int());
+      effects[1].init_packet = packet_num;
+      break;
+    case kVolume2:
+      effects[1].volume = GetParam(paramIdx)->Value()/100;
       break;
     case kPeriod2:
       effects[1].timePeriod_s = GetParam(paramIdx)->Value();
       break;
     case kType3:
       effects[2].type = (effect_t::type_t)(GetParam(paramIdx)->Int());
+      effects[2].init_packet = packet_num;
+      break;
+    case kVolume3:
+      effects[2].volume = GetParam(paramIdx)->Value()/100;
       break;
     case kPeriod3:
       effects[2].timePeriod_s = GetParam(paramIdx)->Value();

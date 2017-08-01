@@ -66,6 +66,7 @@ void write_to_vec(char const *effect, std::vector<uint8_t> &vec) {
 
 
 std::ostream& operator<< (std::ostream &out, effect_t const &effect) {
+    out << "* f " << effect.volume << ' ';
     switch (effect.type) {
         case effect_t::Immersive:
             out << "h 1";
@@ -78,32 +79,32 @@ std::ostream& operator<< (std::ostream &out, effect_t const &effect) {
             break;
         case effect_t::LeftToRight:
             out << "e - h 0 / p - f "
-            << (num_cols-1)*0.5*(1+sin(effect.omega()*packet_num))
+            << (num_cols-1)*0.5*(1+cos(effect.theta))
             << " I % # h " << num_cols << " 2 h 2";
             break;
         case effect_t::Circular:
             out << "I < + p - I % # h " << num_cols << " f "
-            << (num_cols-1) * (0.5 - 0.4*cos(effect.omega()*packet_num)) << " 2"
+            << (num_cols-1) * (0.5 - 0.4*cos(effect.theta)) << " 2"
             " p - I % / # h " << num_cols << " h " << num_rows << " f "
-            << (num_rows-1) * (0.5 - 0.4*sin(effect.omega()*packet_num)) << " 2"
+            << (num_rows-1) * (0.5 - 0.4*sin(effect.theta)) << " 2"
             " h 5";
             break;
         case effect_t::Randomized:
             out << "I *"
-            " < | - I % # h " << num_cols << " f " << xdist[effect.track_id].dist(gen, (int)effect.timePeriod())*0.5 << " h 3"
+            " < | - I % # h " << num_cols << " f " << xdist[effect.track_id].dist(gen, effect.timePeriod())*0.5 << " h 3"
             " < | - I % / # h " << num_cols << " h " << num_rows << " f "
-            << ydist[effect.track_id].dist(gen, (int)effect.timePeriod())*0.5 << "h 3";
+            << ydist[effect.track_id].dist(gen, effect.timePeriod())*0.5 << "h 3";
             break;
         case effect_t::SpreadingOut:
             out << "*"
             " I < | - I % # h " << num_cols << " f " << (num_cols-1)*0.5 << " f "
-            << (num_cols+1)*0.5*(0.3 + 0.7*packet_num/effect.timePeriod())
+            << (num_cols+1)*0.5*(0.3 + 0.7 * (packet_num - effect.init_packet) /effect.timePeriod())
             << " I < | - I / # h " << num_cols << " f " << (num_rows-1)*0.5 << " f "
-            << (num_rows+1)*0.5*(0.3 + 0.7*packet_num/effect.timePeriod());
+            << (num_rows+1)*0.5*(0.3 + 0.7 * (packet_num - effect.init_packet)/effect.timePeriod());
             break;
         case effect_t::Diagonal:
             out << "e - h 0 / p - f "
-            << (num_cols-1)*0.5*(1+sin(effect.omega()*packet_num))
+            << (num_cols-1)*0.5*(1+sin(effect.theta))
             << " / + I % # h " << num_cols << " I % / # h " << num_cols << " h " << num_rows << " f 1.414 2 h 2";
             break;
         case effect_t::typeNum:; // For completeness

@@ -29,7 +29,8 @@ struct effect_t {
         typeNum
     } type;
     uint8_t const track_id;
-    double timePeriod_s;
+    double timePeriod_s, volume = .8, theta = 0;
+    uint32_t init_packet = 0; // For spreading-out effect
 
     effect_t(uint8_t tid): track_id(tid) {}
 
