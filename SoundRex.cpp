@@ -9,6 +9,7 @@
 #include <array>
 #include <cmath>
 #include <cstdlib>
+#include <fstream>
 #include <queue>
 #include <sstream>
 #include <stdexcept>
@@ -113,6 +114,20 @@ void setEffectNames(IParam *param) {
   param->SetDisplayText(effect_t::Diagonal, "Diagonal");
 }
 
+void getServerConfig() {
+  std::ifstream file("~/soundrex_router.txt");
+  std::string ip("192.167.1.1");
+
+  if (file.good()) {
+    file >> ip;
+    file.close();
+  }
+
+  scaServer.sin_family = AF_INET;
+  scaServer.sin_addr.s_addr = inet_addr(ip.c_str());
+  scaServer.sin_port = htons(9430);
+}
+
 SoundRex::SoundRex(IPlugInstanceInfo instanceInfo)
 :	IPLUG_CTOR(kNumParams, kNumPrograms, instanceInfo) {
   TRACE;
@@ -144,9 +159,7 @@ SoundRex::SoundRex(IPlugInstanceInfo instanceInfo)
   //MakePreset("preset 1", ... );
   MakeDefaultPreset((char *) "-", kNumPrograms);
 
-  scaServer.sin_family = AF_INET;
-  scaServer.sin_addr.s_addr = inet_addr("192.167.1.1");
-  scaServer.sin_port = htons(9430);
+  getServerConfig();
 }
 
 void SoundRex::ProcessDoubleReplacing(double** inputs, double** outputs, int nFrames) {
