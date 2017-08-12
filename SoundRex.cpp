@@ -115,7 +115,7 @@ void setEffectNames(IParam *param) {
 }
 
 void getServerConfig() {
-  std::ifstream file("~/soundrex_router.txt");
+  std::ifstream file("/usr/local/soundrex/router.txt");
   std::string ip("192.167.1.1");
 
   if (file.good()) {
