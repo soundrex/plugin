@@ -11,6 +11,7 @@ constexpr int num_samples = 384;
 constexpr int num_channels = 3;
 
 extern uint32_t packet_num;
+extern double master_volume;
 
 void set_rows(int const);
 void set_cols(int const);

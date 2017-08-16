@@ -4,6 +4,9 @@
 
 //////////////////////////// helpers //////////////////////////////
 int num_rows = 10, num_cols = 10;
+double master_volume = 1.;
+uint32_t packet_num = 0;
+
 std::default_random_engine gen(12345);
 std::string const functions = "I#hif+-*/Mm=<%sctel|p:_";
 
@@ -66,7 +69,7 @@ void write_to_vec(char const *effect, std::vector<uint8_t> &vec) {
 
 
 std::ostream& operator<< (std::ostream &out, effect_t const &effect) {
-    out << "* f " << effect.volume << ' ';
+    out << "* f " << master_volume * effect.volume << ' ';
     switch (effect.type) {
         case effect_t::Immersive:
             out << "h 1";

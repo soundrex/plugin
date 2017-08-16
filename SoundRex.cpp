@@ -23,9 +23,7 @@ typedef uint8_t sample_t;
 constexpr sample_t maxval =  255;
 
 std::array<effect_t, num_channels> effects {0, 1, 2};
-uint32_t packet_num = 0;
 sockaddr_in scaServer;
-socklen_t addrlen = sizeof(scaServer);
 int sockfd = 0;
 
 template <typename T, int N>
@@ -97,6 +95,7 @@ enum EParams {
   kPeriod2,
   kType3,
   kPeriod3,
+  kMasterVolume,
   kVolume1,
   kVolume2,
   kVolume3,
@@ -152,6 +151,7 @@ SoundRex::SoundRex(IPlugInstanceInfo instanceInfo)
   GetParam(kPeriod3)->InitDouble("Time Period 3", 1., 0.01, 20.0, 0.01, "s");
 
   //arguments are: name, defaultVal, minVal, maxVal, step
+  GetParam(kMasterVolume)->InitDouble("Master Volume", 100., 0., 100., .1, "%");
   GetParam(kVolume1)->InitDouble("Volume 1", 80., 0., 100., .1, "%");
   GetParam(kVolume2)->InitDouble("Volume 2", 80., 0., 100., .1, "%");
   GetParam(kVolume3)->InitDouble("Volume 3", 80., 0., 100., .1, "%");
@@ -262,6 +262,9 @@ void SoundRex::OnParamChange(int paramIdx) {
       break;
     case kPeriod3:
       effects[2].timePeriod_s = GetParam(paramIdx)->Value();
+      break;
+    case kMasterVolume:
+      master_volume = GetParam(paramIdx)->Value()/100;
       break;
     default:
       break;
